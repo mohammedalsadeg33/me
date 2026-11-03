@@ -23,19 +23,19 @@ export const CourseCategoryCard: React.FC<CourseCategoryCardProps> = ({
     switch (category.statusType) {
       case 'verified':
         return {
-          icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />,
-          classes: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
+          classes: 'text-emerald-800 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800'
         };
       case 'provisional':
         return {
-          icon: <ShieldCheck className="w-3.5 h-3.5 text-[#176B65]" />,
-          classes: 'text-[#176B65] bg-[#EEF9F5] border-[#A8E6CF]'
+          icon: <ShieldCheck className="w-3.5 h-3.5 text-[#176B65] dark:text-[#A8E6CF]" />,
+          classes: 'text-[#176B65] dark:text-[#A8E6CF] bg-[#EEF9F5] dark:bg-[#123838] border-[#A8E6CF] dark:border-[#176B65]'
         };
       case 'verification-required':
       default:
         return {
-          icon: <AlertCircle className="w-3.5 h-3.5 text-amber-600" />,
-          classes: 'text-amber-800 bg-amber-50 border-amber-200'
+          icon: <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />,
+          classes: 'text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800'
         };
     }
   };
@@ -45,15 +45,15 @@ export const CourseCategoryCard: React.FC<CourseCategoryCardProps> = ({
   return (
     <div
       onClick={() => onSelect(category.id)}
-      className={`group flex flex-col justify-between bg-white rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer shadow-xs hover:shadow-md ${
+      className={`group flex flex-col justify-between bg-white dark:bg-[#102430] rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer shadow-xs hover:shadow-md ${
         isSelected
-          ? 'border-[#176B65] ring-2 ring-[#176B65]/20 shadow-md'
-          : 'border-slate-200/90 hover:border-[#176B65]/50'
+          ? 'border-[#176B65] dark:border-[#A8E6CF] ring-2 ring-[#176B65]/20 dark:ring-[#A8E6CF]/20 shadow-md'
+          : 'border-slate-200/90 dark:border-slate-800 hover:border-[#176B65]/50 dark:hover:border-[#A8E6CF]/50'
       }`}
     >
       <div>
         {/* Category Image with zero-pill status overlay */}
-        <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
+        <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
           {!imgError && imageSrc ? (
             <img
               src={imageSrc}
@@ -72,7 +72,7 @@ export const CourseCategoryCard: React.FC<CourseCategoryCardProps> = ({
           )}
 
           {/* Dark gradient shadow at bottom of image for contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent pointer-events-none" />
 
           {/* Optional Top Status Badge */}
           {category.statusBadge && (
@@ -97,13 +97,13 @@ export const CourseCategoryCard: React.FC<CourseCategoryCardProps> = ({
 
         {/* Content Body */}
         <div className="p-5 sm:p-6 space-y-3">
-          <p className="text-sm text-slate-700 leading-relaxed font-normal">
+          <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
             “{category.description}”
           </p>
 
-          <div className="pt-2 border-t border-slate-100 text-xs text-slate-600 space-y-1">
-            <span className="font-semibold text-slate-800">Curriculum Focus:</span>
-            <p className="text-slate-600 line-clamp-2 leading-relaxed">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-1">
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Curriculum Focus:</span>
+            <p className="text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
               {category.intendedFor}
             </p>
           </div>
@@ -121,7 +121,7 @@ export const CourseCategoryCard: React.FC<CourseCategoryCardProps> = ({
           className={`w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer ${
             isSelected
               ? 'bg-[#176B65] text-white hover:bg-[#102C3A]'
-              : 'bg-slate-100 text-[#102C3A] hover:bg-[#EEF9F5] hover:text-[#176B65]'
+              : 'bg-slate-100 dark:bg-slate-800 text-[#102C3A] dark:text-slate-200 hover:bg-[#EEF9F5] dark:hover:bg-[#153243] hover:text-[#176B65] dark:hover:text-[#A8E6CF]'
           }`}
         >
           <span>Explore Courses</span>

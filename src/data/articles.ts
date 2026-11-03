@@ -75,7 +75,7 @@ export const ARTICLES: Article[] = [
       'Begin by separating your activities into four distinct pillars: Academic Honors, Scholarly Publications/Presentations, Clinical Audits, and Institutional Leadership. Every entry must feature a quantitative metric: "Coordinated emergency triage workshop for 120 preclinical students" holds substantially more weight than "Workshop organizer."',
       'Never wait until the final year or internship to draft your CV. By tracking projects in real-time as they occur, you preserve accurate dates, supervisor contact details, and project deliverable specifics.'
     ],
-    imagePath: IMAGES.heroStudy
+    imagePath: IMAGES.editorialAcademicCv
   },
   {
     id: 'art-surviving-clinical-internship',
@@ -100,6 +100,6 @@ export const ARTICLES: Article[] = [
       'Cognitive stamina relies on rigorous organization. Carry an organized paper tracking list. Mark critical labs with high-priority check boxes, and never rely on memory when carrying verbal orders across three floors.',
       'Most importantly, remember that asking for senior help during diagnostic ambiguity is a hallmark of clinical maturity, not weakness. Patient safety always trumps student ego.'
     ],
-    imagePath: IMAGES.opportunityHospital
+    imagePath: IMAGES.editorialInternshipWard
   }
 ];

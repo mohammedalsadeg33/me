@@ -1,6 +1,6 @@
 {
-  "summary":  "Implementation plan for user profile avatar in the Navbar with an interactive dropdown menu and account settings modal allowing Egyptian medical students to manage their display name, medical school faculty, and password.",
-  "updatedAt":  "2026-10-23T07:19:26.250855710Z",
-  "requestFeedback":  true,
-  "userFacing":  true
+  "summary": "Comprehensive architecture and implementation plan for the Interactive Medical Block & Spaced Repetition Planner (مخطط ومنظم مراجعة البلوكات الطبية) tailored to Egyptian medical students in the 5+2 modular system.",
+  "updatedAt": "2026-11-02T23:50:02.200748351Z",
+  "requestFeedback": true,
+  "userFacing": true
 }

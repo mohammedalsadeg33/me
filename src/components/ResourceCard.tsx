@@ -48,23 +48,23 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   onSelectResource
 }) => {
   return (
-    <div className="group flex flex-col justify-between bg-white rounded-xl border border-slate-200/90 hover:border-[#176B65]/40 transition-all duration-200 p-6 hover:shadow-md">
+    <div className="group flex flex-col justify-between bg-white dark:bg-[#102430] rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#176B65] dark:hover:border-[#176B65] transition-all duration-200 p-6 hover:shadow-md">
       <div>
         {/* Anti-Slop Zero-Pill Metadata Line */}
-        <div className="flex items-center justify-between gap-2 text-xs text-slate-500 mb-3 pb-2 border-b border-slate-100">
+        <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-[#176B65]">
+            <span className="font-semibold text-[#176B65] dark:text-[#A8E6CF]">
               {resource.categoryLabel}
             </span>
-            <span aria-hidden="true" className="text-slate-300">·</span>
-            <span className="inline-flex items-center gap-1 text-slate-600 capitalize">
+            <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
+            <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300 capitalize">
               {getTypeIcon(resource.resourceType)}
               <span>{resource.resourceType}</span>
             </span>
             {resource.duration && (
               <>
-                <span aria-hidden="true" className="text-slate-300">·</span>
-                <span className="tabular-nums text-slate-500">{resource.duration}</span>
+                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="tabular-nums text-slate-500 dark:text-slate-400">{resource.duration}</span>
               </>
             )}
           </div>
@@ -77,8 +77,8 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             }}
             className={`p-1.5 rounded-md transition-colors cursor-pointer shrink-0 ${
               isBookmarked
-                ? 'text-[#176B65] bg-[#EEF9F5]'
-                : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                ? 'text-[#176B65] dark:text-[#A8E6CF] bg-[#EEF9F5] dark:bg-[#123838]'
+                : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this resource'}
             title={isBookmarked ? 'Saved to Bookmarks' : 'Save for later'}
@@ -90,25 +90,25 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         {/* Title */}
         <h3
           onClick={() => onSelectResource(resource)}
-          className="text-base font-semibold text-[#102C3A] group-hover:text-[#176B65] transition-colors cursor-pointer line-clamp-2 leading-snug mb-2"
+          className="text-base font-semibold text-[#102C3A] dark:text-white group-hover:text-[#176B65] dark:group-hover:text-[#A8E6CF] transition-colors cursor-pointer line-clamp-2 leading-snug mb-2"
         >
           {resource.title}
         </h3>
 
         {/* Summary */}
-        <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 mb-4">
+        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3 mb-4">
           {resource.summary}
         </p>
       </div>
 
       {/* Footer Zone: Publisher & Actions */}
-      <div className="pt-4 border-t border-slate-100 mt-2">
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
+      <div className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-2">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-4">
           <div className="truncate mr-2">
-            <span className="text-slate-400">Publisher:</span>{' '}
-            <span className="font-medium text-slate-700">{resource.publisher}</span>
+            <span className="text-slate-400 dark:text-slate-500">Publisher:</span>{' '}
+            <span className="font-medium text-slate-700 dark:text-slate-300">{resource.publisher}</span>
           </div>
-          <span className="shrink-0 text-slate-400">
+          <span className="shrink-0 text-slate-400 dark:text-slate-500">
             {formatAcademicLevel(resource.level)}
           </span>
         </div>
@@ -116,7 +116,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => onSelectResource(resource)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#102C3A] hover:text-[#176B65] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#102C3A] dark:text-slate-200 hover:text-[#176B65] dark:hover:text-[#A8E6CF] transition-colors cursor-pointer"
           >
             <span>Key Takeaways</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -126,7 +126,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             href={resource.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-white bg-slate-50 hover:bg-[#176B65] border border-slate-200 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:text-white dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-[#176B65] dark:hover:bg-[#176B65] border border-slate-200 dark:border-slate-700 rounded-lg transition-colors"
           >
             <span>View Source</span>
             <ExternalLink className="w-3 h-3" />

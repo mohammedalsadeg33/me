@@ -120,6 +120,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSubmit }) => {
               </li>
               <li>
                 <button
+                  onClick={() => { onNavigate('block-planner'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  <span>Block Planner</span>
+                  <span className="text-[10px] font-bold px-1 rounded bg-[#176B65] text-[#A8E6CF]">
+                    New
+                  </span>
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => { onNavigate('career-development'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="hover:text-white transition-colors"
                 >

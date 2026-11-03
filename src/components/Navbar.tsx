@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bookmark, Menu, X, Mail, LogOut, Sun, Moon, Settings, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  Bookmark,
+  Menu,
+  X,
+  Mail,
+  LogOut,
+  Sun,
+  Moon,
+  Settings,
+  ChevronDown,
+  Brain,
+  MoreHorizontal
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -11,6 +24,7 @@ interface NavbarProps {
   bookmarksCount: number;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
   onOpenSettings: () => void;
+  onOpenBlockPlanner?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -19,14 +33,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSearch,
   onOpenBookmarks,
   bookmarksCount,
-  onOpenAuth,
-  onOpenSettings
+  onOpenSettings,
+  onOpenBlockPlanner
 }) => {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   // Extract student initials for the avatar badge
   const getInitials = () => {
@@ -44,19 +59,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     return 'MR';
   };
 
-  // Close profile dropdown on outside click
+  // Close profile dropdown and more menu on outside click
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest('#profile-dropdown-container')) {
         setProfileDropdownOpen(false);
       }
+      if (!target.closest('#more-menu-container')) {
+        setMoreMenuOpen(false);
+      }
     };
-    if (profileDropdownOpen) {
+    if (profileDropdownOpen || moreMenuOpen) {
       document.addEventListener('mousedown', handleOutsideClick);
       return () => document.removeEventListener('mousedown', handleOutsideClick);
     }
-  }, [profileDropdownOpen]);
+  }, [profileDropdownOpen, moreMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,16 +95,18 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   }, [mobileMenuOpen]);
 
-  // Close mobile menu on Escape key press
+  // Close menus on Escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
-        setMobileMenuOpen(false);
+      if (e.key === 'Escape') {
+        if (mobileMenuOpen) setMobileMenuOpen(false);
+        if (moreMenuOpen) setMoreMenuOpen(false);
+        if (profileDropdownOpen) setProfileDropdownOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, moreMenuOpen, profileDropdownOpen]);
 
   // Close mobile menu if viewport resized to desktop width
   useEffect(() => {
@@ -99,18 +119,33 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const navItems = [
+  // Primary navigation links visible directly on the desktop bar
+  const primaryNavItems = [
     { id: 'home', label: 'Home' },
     { id: 'courses', label: 'Courses' },
     { id: 'study-smarter', label: 'Study Smarter' },
+    { id: 'block-planner', label: 'Block Planner' },
+  ];
+
+  // Secondary navigation links cleanly contained in the three-dot navigation menu
+  const secondaryNavItems = [
     { id: 'career-development', label: 'Career Development' },
     { id: 'opportunities', label: 'Opportunities' },
     { id: 'community', label: 'Student Community' },
   ];
 
+  // All navigation items combined for mobile menu
+  const allNavItems = [
+    ...primaryNavItems,
+    ...secondaryNavItems
+  ];
+
+  const isSecondaryActive = secondaryNavItems.some((item) => item.id === currentTab);
+
   const handleNavClick = (id: string) => {
     onNavigate(id);
     setMobileMenuOpen(false);
+    setMoreMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -123,7 +158,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 gap-4 md:gap-8">
+        <div className="flex items-center justify-between h-16 sm:h-18 gap-3 lg:gap-6">
+          
           {/* Zone 1: Brand wordmark */}
           <div className="flex items-center gap-3 shrink-0">
             <button
@@ -145,40 +181,108 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Zone 2: Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-medium">
-            {navItems.map((item) => {
+          {/* Zone 2: Navigation Links & Three-Dot Navigation Menu (Desktop) */}
+          <nav
+            aria-label="Primary Navigation"
+            className="hidden lg:flex items-center gap-3 xl:gap-5 text-sm font-medium"
+          >
+            {primaryNavItems.map((item) => {
               const isActive = currentTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`relative py-1 text-sm whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF] rounded ${
+                  className={`relative py-1.5 px-2 text-sm whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF] rounded cursor-pointer ${
                     isActive
                       ? 'text-[#A8E6CF] font-semibold'
                       : 'text-slate-200 hover:text-white'
                   }`}
                 >
-                  {item.label}
+                  <span className="flex items-center gap-1.5">
+                    <span>{item.label}</span>
+                    {item.id === 'block-planner' && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#176B65] text-[#A8E6CF] border border-[#A8E6CF]/30">
+                        مخطط
+                      </span>
+                    )}
+                  </span>
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#A8E6CF] rounded-full" />
                   )}
                 </button>
               );
             })}
+
+            {/* Three-Dot Navigation Menu for Secondary Pages - Strictly Positioned within Layout */}
+            <div id="more-menu-container" className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                className={`relative py-1.5 px-2.5 text-sm whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF] rounded-lg flex items-center gap-1.5 cursor-pointer border ${
+                  isSecondaryActive || moreMenuOpen
+                    ? 'text-[#A8E6CF] bg-[#183C4F] border-[#A8E6CF]/30 font-semibold'
+                    : 'text-slate-200 hover:text-white hover:bg-[#183C4F]/60 border-transparent'
+                }`}
+                aria-expanded={moreMenuOpen}
+                aria-haspopup="true"
+                aria-label="More navigation pages"
+                title="More navigation pages"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+                <span className="text-xs">More</span>
+                {isSecondaryActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A8E6CF]" />
+                )}
+              </button>
+
+              {/* Three-Dot Dropdown Card - Positioned strictly within container without clipping */}
+              {moreMenuOpen && (
+                <div
+                  role="menu"
+                  aria-orientation="vertical"
+                  className="absolute left-0 mt-2 w-56 rounded-2xl bg-[#102C3A] dark:bg-[#0E202B] border border-[#183C4F] dark:border-[#1E3D4F] shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                >
+                  <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-slate-400 font-bold border-b border-[#183C4F]/70 mb-1">
+                    Secondary Pages
+                  </div>
+                  {secondaryNavItems.map((item) => {
+                    const isActive = currentTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        role="menuitem"
+                        type="button"
+                        onClick={() => handleNavClick(item.id)}
+                        className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
+                          isActive
+                            ? 'bg-[#176B65] text-white font-semibold'
+                            : 'text-slate-200 hover:bg-[#183C4F] hover:text-white'
+                        }`}
+                      >
+                        <span>{item.label}</span>
+                        {isActive && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#A8E6CF]" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
-          {/* Zone 3: Actions (Search, Bookmarks, Contact, Mobile Toggle) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Zone 3: Actions & Utility Controls (Unified Toolbar Alignment) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Quick Search Trigger */}
             <button
+              type="button"
               onClick={onOpenSearch}
-              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 text-xs font-medium text-slate-100 bg-[#183C4F]/80 hover:bg-[#183C4F] hover:text-white rounded-lg border border-slate-700/80 transition-colors cursor-pointer min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="flex items-center gap-1.5 sm:gap-2 h-9 px-2.5 sm:px-3 text-xs font-medium text-slate-200 bg-[#183C4F]/80 hover:bg-[#183C4F] hover:text-white rounded-lg border border-slate-700/70 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label="Search resources and opportunities"
               title="Search (Ctrl+K)"
             >
-              <Search className="w-4 h-4 text-slate-200" />
-              <span className="hidden sm:inline text-xs">Search directory</span>
+              <Search className="w-3.5 h-3.5 text-slate-200" />
+              <span className="hidden sm:inline text-xs">Search</span>
               <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] text-slate-300 bg-[#102C3A] rounded border border-slate-700">
                 ⌘K
               </kbd>
@@ -186,14 +290,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Saved Bookmarks Trigger */}
             <button
+              type="button"
               onClick={onOpenBookmarks}
-              className="relative p-2.5 text-slate-100 hover:text-white hover:bg-[#183C4F] rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 text-slate-200 hover:text-white hover:bg-[#183C4F] rounded-lg border border-transparent hover:border-slate-700/60 transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label="View saved bookmarks"
               title="Saved items"
             >
               <Bookmark className="w-4 h-4" />
               {bookmarksCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-4 h-4 px-1 text-[10px] font-bold text-[#102C3A] bg-[#A8E6CF] rounded-full">
+                <span className="absolute top-1.5 right-1.5 flex items-center justify-center min-w-4 h-4 px-1 text-[10px] font-bold text-[#102C3A] bg-[#A8E6CF] rounded-full">
                   {bookmarksCount}
                 </span>
               )}
@@ -202,18 +307,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Contact Email Trigger (Desktop & Tablet) */}
             <a
               href="mailto:mohammedalsadeg33@gmail.com"
-              className="hidden sm:flex p-2.5 text-slate-100 hover:text-white hover:bg-[#183C4F] rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 text-slate-200 hover:text-white hover:bg-[#183C4F] rounded-lg border border-transparent hover:border-slate-700/60 transition-colors cursor-pointer items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label="Contact official email"
               title="Email: mohammedalsadeg33@gmail.com"
             >
               <Mail className="w-4 h-4" />
             </a>
 
-            {/* Dark Mode Toggle (Desktop) */}
+            {/* Dark Mode Toggle - Perfectly dimensioned and aligned with utility controls */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2.5 text-slate-100 hover:text-white hover:bg-[#183C4F] rounded-lg transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="w-9 h-9 sm:w-10 sm:h-10 text-slate-200 hover:text-white hover:bg-[#183C4F] rounded-lg border border-transparent hover:border-slate-700/60 transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
@@ -226,7 +331,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Authentication / Profile Avatar (Desktop) - Only rendered when logged in */}
             {user && (
-              <div className="hidden md:flex items-center gap-2 border-l border-[#183C4F] pl-2.5 ml-1">
+              <div className="hidden md:flex items-center gap-2 border-l border-[#183C4F] pl-2 ml-0.5">
                 <div id="profile-dropdown-container" className="relative">
                   <button
                     type="button"
@@ -238,13 +343,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     {/* Gradient Initials Avatar */}
                     <div className="relative">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#176B65] to-[#11534E] border border-[#A8E6CF]/40 flex items-center justify-center text-[#A8E6CF] font-bold text-xs shadow-xs">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#176B65] to-[#11534E] border border-[#A8E6CF]/40 flex items-center justify-center text-[#A8E6CF] font-bold text-xs shadow-xs">
                         {getInitials()}
                       </div>
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#102C3A]" />
+                      <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-[#102C3A]" />
                     </div>
 
-                    <span className="text-xs font-semibold text-slate-200 max-w-[110px] truncate">
+                    <span className="text-xs font-semibold text-slate-200 max-w-[100px] truncate">
                       {user.user_metadata?.display_name || user.email?.split('@')[0]}
                     </span>
 
@@ -278,6 +383,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                       {/* Dropdown Menu Items */}
                       <div className="p-1.5 space-y-0.5 text-xs">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            handleNavClick('block-planner');
+                          }}
+                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-[#EEF9F5] dark:hover:bg-[#153243] hover:text-[#176B65] dark:hover:text-[#A8E6CF] transition-colors cursor-pointer text-left font-medium"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Brain className="w-4 h-4 text-[#176B65] dark:text-[#A8E6CF]" />
+                            <span>مخطط مراجعة البلوكات</span>
+                          </div>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EEF9F5] dark:bg-[#16363B] text-[#176B65] dark:text-[#A8E6CF]">
+                            5+2
+                          </span>
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => {
@@ -330,11 +452,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Accurately positioned within navigation bounds */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 text-slate-100 hover:text-white hover:bg-[#183C4F] rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 text-slate-100 hover:text-white hover:bg-[#183C4F] rounded-lg transition-colors flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-navigation-menu"
@@ -345,16 +467,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Backdrop overlay for outside click to dismiss */}
+      {/* Backdrop overlay for outside click to dismiss mobile menu */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 top-[4.5rem] bg-black/50 backdrop-blur-xs z-30 lg:hidden transition-opacity duration-200"
+          className="fixed inset-0 top-16 sm:top-18 bg-black/50 backdrop-blur-xs z-30 lg:hidden transition-opacity duration-200"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      {/* Mobile Navigation Dropdown Menu */}
+      {/* Mobile Navigation Dropdown Drawer */}
       <div
         id="mobile-navigation-menu"
         role="navigation"
@@ -372,23 +494,33 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-[11px] text-[#A8E6CF] font-medium tracking-normal capitalize">MedRise Egypt</span>
           </div>
 
-          {/* Nav Items */}
+          {/* All Nav Items (Preserving all existing links + dedicated Block Planner) */}
           <div className="space-y-1">
-            {navItems.map((item) => {
+            {allNavItems.map((item) => {
               const isActive = currentTab === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleNavClick(item.id)}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF] ${
+                  className={`w-full text-left px-3.5 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF] cursor-pointer ${
                     isActive
                       ? 'bg-[#176B65] text-white font-semibold shadow-xs'
                       : 'text-slate-100 hover:bg-[#183C4F] hover:text-white active:bg-[#183C4F]/90'
                   }`}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="text-sm tracking-wide">{item.label}</span>
+                  <span className="flex items-center gap-2">
+                    {item.id === 'block-planner' && (
+                      <Brain className="w-4 h-4 text-[#A8E6CF]" />
+                    )}
+                    <span className="text-sm tracking-wide">{item.label}</span>
+                    {item.id === 'block-planner' && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#0E2430] text-[#A8E6CF] border border-[#A8E6CF]/30">
+                        مخطط البلوكات
+                      </span>
+                    )}
+                  </span>
                   {isActive && (
                     <span className="flex items-center gap-1.5 text-xs text-[#A8E6CF] font-semibold">
                       <span>Active</span>
@@ -458,7 +590,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenSearch();
               }}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
             >
               <Search className="w-3.5 h-3.5 text-slate-200" />
               <span>Search Hub</span>
@@ -469,7 +601,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenBookmarks();
               }}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
             >
               <Bookmark className="w-3.5 h-3.5 text-[#A8E6CF]" />
               <span>Saved Items ({bookmarksCount})</span>
@@ -481,7 +613,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#183C4F]/70 hover:bg-[#183C4F] text-slate-100 text-xs font-medium border border-slate-700/70 min-h-[44px] transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A8E6CF]"
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               <span className="flex items-center gap-2">

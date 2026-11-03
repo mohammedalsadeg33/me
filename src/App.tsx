@@ -20,6 +20,8 @@ import { BookmarksDrawer } from './components/BookmarksDrawer';
 import { SearchModal } from './components/SearchModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { AccountSettingsModal } from './components/auth/AccountSettingsModal';
+import { BlockPlannerModal } from './components/BlockPlannerModal';
+import { BlockPlannerPage } from './components/pages/BlockPlannerPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { RESOURCES } from './data/resources';
@@ -36,6 +38,8 @@ function MainAppContent() {
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isBlockPlannerOpen, setIsBlockPlannerOpen] = useState(false);
+  const [plannerInitialBlockId, setPlannerInitialBlockId] = useState<string | undefined>(undefined);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -72,6 +76,13 @@ function MainAppContent() {
   const handleOpenAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthOpen(true);
+  };
+
+  const handleOpenBlockPlanner = (blockId?: string) => {
+    if (blockId) {
+      setPlannerInitialBlockId(blockId);
+    }
+    handleNavigate('block-planner');
   };
 
   const featuredResources = RESOURCES.filter((r) => r.featured);
@@ -122,6 +133,7 @@ function MainAppContent() {
         bookmarksCount={bookmarksCount}
         onOpenAuth={handleOpenAuth}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenBlockPlanner={() => handleOpenBlockPlanner()}
       />
 
       {/* Main Content Area */}
@@ -138,6 +150,7 @@ function MainAppContent() {
             onSelectResource={(r) => setSelectedResource(r)}
             onSelectArticle={(a) => setSelectedArticle(a)}
             onOpenAuth={handleOpenAuth}
+            onOpenBlockPlanner={handleOpenBlockPlanner}
           />
         )}
 
@@ -154,6 +167,14 @@ function MainAppContent() {
             isBookmarked={isBookmarked}
             onToggleBookmark={toggleBookmark}
             onSelectResource={(r) => setSelectedResource(r)}
+            onOpenBlockPlanner={() => handleOpenBlockPlanner()}
+          />
+        )}
+
+        {currentTab === 'block-planner' && (
+          <BlockPlannerPage
+            initialBlockId={plannerInitialBlockId}
+            onNavigate={handleNavigate}
           />
         )}
 
@@ -237,6 +258,13 @@ function MainAppContent() {
       <AccountSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* Interactive Medical Block Revision & Spaced Repetition Planner */}
+      <BlockPlannerModal
+        isOpen={isBlockPlannerOpen}
+        onClose={() => setIsBlockPlannerOpen(false)}
+        initialBlockId={plannerInitialBlockId}
       />
     </div>
   );
